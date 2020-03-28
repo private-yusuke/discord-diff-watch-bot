@@ -19,6 +19,10 @@ export default class DiscordDriver implements Driver {
       config.discord.channel,
     ) as Discord.TextChannel
     if (c) this.channel = c*/
+    const sleep = (msec: number) =>
+      new Promise((resolve) => setTimeout(resolve, msec))
+    await sleep(1000)
+
     config.discord.channels.forEach((channel) => {
       const c = this.client.channels.cache.get(channel) as Discord.TextChannel
       if (c) this.channels.push(c)
