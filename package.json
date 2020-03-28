@@ -4,7 +4,8 @@
   "description": "A bot for watching the specified website and notify the difference.",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint '*/**/*.{js,ts}' --quiet --fix"
+    "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
+    "build": "tsc"
   },
   "author": "public_yusuke",
   "license": "MIT",
