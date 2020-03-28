@@ -1,0 +1,20 @@
+{
+    "watchInterval": {
+        "value": 10,
+        "unit": "seconds"
+    },
+    "watchURLs": [
+        "http://www.tsukuba.ac.jp/",
+        "http://www.tsukuba.ac.jp/news/n202003271007.html",
+        "http://www.tsukuba.ac.jp/campuslife/ceremony/orientation-2020-4.html"
+    ],
+    "discord": {
+        "token": "write your token here",
+        "channels": [
+            "314159265358979323",
+            "write your channel ids here"
+        ],
+        "motd": false,
+        "threshold": 300
+    }
+}

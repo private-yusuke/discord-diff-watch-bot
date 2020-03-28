@@ -81,3 +81,5 @@ typings/
 token.json
 package-lock.json
 built/
+
+config.json
