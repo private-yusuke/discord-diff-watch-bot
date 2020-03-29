@@ -2,6 +2,7 @@ import Driver from './driver'
 import * as Discord from 'discord.js'
 import config from '../config.json'
 import moment from 'moment'
+import { Stream } from 'stream'
 
 export default class DiscordDriver implements Driver {
   name = 'discord'
@@ -38,8 +39,28 @@ export default class DiscordDriver implements Driver {
     }
     console.log(`Discord init done! ${this.channels}`)
   }
-  send(content: string): void {
+  send(message: string): void {
     if (this.channels.length > 0)
-      this.channels.forEach((channel) => channel.send(content))
+      this.channels.forEach((channel) => channel.send(message))
+  }
+  upload(
+    message: string,
+    content: string | Buffer | Stream,
+    title: string,
+  ): void {
+    const attachment = new Discord.MessageAttachment(content, title)
+    if (this.channels.length > 0) {
+      this.channels.forEach(async (channel) => {
+        let res: Discord.Message
+        try {
+          res = await channel.send(message, {
+            files: [attachment],
+          })
+          console.log(res)
+        } catch (e) {
+          console.log(e)
+        }
+      })
+    }
   }
 }

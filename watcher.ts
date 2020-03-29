@@ -48,7 +48,7 @@ export default class Watcher {
     }
     if (current.content != old.content) {
       this.contents.set(url, current)
-      let d = diff.createTwoFilesPatch(
+      const d = diff.createTwoFilesPatch(
         'outdated',
         'current',
         old.content,
@@ -56,7 +56,6 @@ export default class Watcher {
         old.date.format('YYYY-MM-DD HH:mm:ss'),
         current.date.format('YYYY-MM-DD HH:mm:ss'),
       )
-      d = d.split('\n').splice(1).join('\n').trim()
       return {
         d: d,
         url: url,
