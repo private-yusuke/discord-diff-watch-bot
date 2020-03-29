@@ -21,8 +21,15 @@ watcher.onDiff = (diff) => {
   const message = `更新が検出されました！${moment().format(
     'YYYY-MM-DD HH:mm:ss',
   )}`
-  const readable = new Readable()
-  readable.push(diff.d)
-  readable.push(null)
-  driver.upload(message, readable, `diff-${moment().toString()}.txt`)
+  const content = `更新が検出されました！${moment().format(
+    'YYYY-MM-DD HH:mm:ss',
+  )}\`\`\`${diff.d}\`\`\`\n${diff.url}`
+  if (content.length > config.discord.threshold) {
+    const readable = new Readable()
+    readable.push(diff.d)
+    readable.push(null)
+    driver.upload(message, readable, `diff-${moment().toString()}.txt`)
+  } else {
+    driver.send(content)
+  }
 }
