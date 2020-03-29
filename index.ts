@@ -20,7 +20,7 @@ watcher.onDiff = (diff) => {
   console.debug(diff.d)
   const message = `更新が検出されました！${moment().format(
     'YYYY-MM-DD HH:mm:ss',
-  )}`
+  )}\n${diff.url}`
   const content = `更新が検出されました！${moment().format(
     'YYYY-MM-DD HH:mm:ss',
   )}\`\`\`${diff.d}\`\`\`\n${diff.url}`
