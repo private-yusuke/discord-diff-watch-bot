@@ -11,10 +11,10 @@ console.log(config.watchInterval)
 
 const duration = moment.duration(
   config.watchInterval.value,
-  config.watchInterval.unit as never,
+  config.watchInterval.unit as moment.unitOfTime.Base,
 )
 const watcher = new Watcher(config.watchURLs, duration)
-watcher.onDiff = (diff) => {
+watcher.onDiff = (diff): void => {
   console.debug(`diff found: ${moment().toString()} at ${diff.url}`)
   console.debug(diff.d)
   const message = `更新が検出されました！${moment().format(

@@ -90,7 +90,6 @@ export default class DiscordDriver implements Driver {
     file: string | Buffer | Stream,
     title: string,
   ): Promise<MessageLike[]> {
-    const attachment = new Discord.MessageAttachment(file, title)
     const arr: MessageLike[] = []
     if (this.channels.length > 0) {
       for (const channel of this.channels) {
