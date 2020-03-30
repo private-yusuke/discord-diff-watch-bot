@@ -3,6 +3,8 @@ import * as Discord from 'discord.js'
 import config from '../config.json'
 import moment from 'moment'
 import { Stream } from 'stream'
+import MessageLike from '../models/message-like'
+import User from '../models/user'
 
 export default class DiscordDriver implements Driver {
   name = 'discord'
@@ -14,13 +16,11 @@ export default class DiscordDriver implements Driver {
     this.channels = []
     this.initialize(motd)
   }
+
   async initialize(motd: boolean): Promise<void> {
     await this.client.login(config.discord.token)
-    /*const c = this.client.channels.cache.get(
-      config.discord.channel,
-    ) as Discord.TextChannel
-    if (c) this.channel = c*/
-    const sleep = (msec: number) =>
+
+    const sleep = (msec: number): Promise<unknown> =>
       new Promise((resolve) => setTimeout(resolve, msec))
     await sleep(1000)
 
@@ -39,28 +39,65 @@ export default class DiscordDriver implements Driver {
     }
     console.log(`Discord init done! ${this.channels}`)
   }
-  send(message: string): void {
-    if (this.channels.length > 0)
-      this.channels.forEach((channel) => channel.send(message))
+  normalizeUser(user: Discord.User): User {
+    return new User(user.id, user.username, user.username, user.bot)
   }
-  upload(
-    message: string,
-    content: string | Buffer | Stream,
+  async send(content: string, channel: string): Promise<MessageLike> {
+    const c = this.client.channels.cache.get(channel) as Discord.TextChannel
+    if (!c) throw new Error(`Channel not found: ${channel}`)
+    const res = await c.send(content)
+    return new MessageLike(
+      res.id,
+      this.normalizeUser(res.author),
+      res.content,
+      res.channel.id,
+      this,
+    )
+  }
+
+  async sendAll(content: string): Promise<MessageLike[]> {
+    const arr: MessageLike[] = []
+    if (this.channels.length > 0)
+      for (const channel of this.channels) {
+        const res = await this.send(content, channel.id)
+        arr.push(res)
+      }
+    return arr
+  }
+  async upload(
+    content: string,
+    file: string | Buffer | Stream,
     title: string,
-  ): void {
-    const attachment = new Discord.MessageAttachment(content, title)
+    channel: string,
+  ): Promise<MessageLike> {
+    const attachment = new Discord.MessageAttachment(file, title)
+
+    const c = this.client.channels.cache.get(channel) as Discord.TextChannel
+    const res = await c.send(content, {
+      files: [attachment],
+    })
+    return new MessageLike(
+      res.id,
+      this.normalizeUser(res.author),
+      res.content,
+      res.channel.id,
+      this,
+    )
+  }
+
+  async uploadAll(
+    content: string,
+    file: string | Buffer | Stream,
+    title: string,
+  ): Promise<MessageLike[]> {
+    const attachment = new Discord.MessageAttachment(file, title)
+    const arr: MessageLike[] = []
     if (this.channels.length > 0) {
-      this.channels.forEach(async (channel) => {
-        let res: Discord.Message
-        try {
-          res = await channel.send(message, {
-            files: [attachment],
-          })
-          console.log(res)
-        } catch (e) {
-          console.log(e)
-        }
-      })
+      for (const channel of this.channels) {
+        const res = await this.upload(content, file, title, channel.id)
+        arr.push(res)
+      }
     }
+    return arr
   }
 }

@@ -1,9 +1,8 @@
-import { Client } from 'discord.js'
 import moment from 'moment'
 import Watcher from './watcher'
 import config from './config.json'
-import DiscordDriver from './drivers/discord'
 import { Readable } from 'stream'
+import DiscordDriver from './drivers/discord'
 
 const driver = new DiscordDriver(config.discord.motd)
 console.log('>>> Starting... <<<')
@@ -28,8 +27,8 @@ watcher.onDiff = (diff) => {
     const readable = new Readable()
     readable.push(diff.d)
     readable.push(null)
-    driver.upload(message, readable, `diff-${moment().toString()}.txt`)
+    driver.uploadAll(message, readable, `diff-${moment().toString()}.txt`)
   } else {
-    driver.send(content)
+    driver.sendAll(content)
   }
 }
