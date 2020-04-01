@@ -10,19 +10,22 @@ export default class DiscordDriver implements Driver {
   name = 'discord'
   client: Discord.Client
   channels: Discord.TextChannel[]
+  onMessage?: (message: MessageLike) => void
 
-  constructor(motd: boolean) {
+  constructor() {
     this.client = new Discord.Client()
     this.channels = []
-    this.initialize(motd)
   }
 
   async initialize(motd: boolean): Promise<void> {
     await this.client.login(config.discord.token)
 
-    const sleep = (msec: number): Promise<unknown> =>
-      new Promise((resolve) => setTimeout(resolve, msec))
-    await sleep(1000)
+    // Waiting for logging in.
+    await new Promise((resolve) => {
+      this.client.on('ready', () => {
+        resolve()
+      })
+    })
 
     config.discord.channels.forEach((channel) => {
       const c = this.client.channels.cache.get(channel) as Discord.TextChannel
@@ -37,22 +40,45 @@ export default class DiscordDriver implements Driver {
         ),
       )
     }
+    this.client.on('message', (message) => {
+      // Partial messages are not needed so skip them.
+      if (message.partial) return
+      const msg = this.normalizeMessage(message)
+      if (this.onMessage) this.onMessage(msg)
+    })
+
     console.log(`Discord init done! ${this.channels}`)
   }
-  normalizeUser(user: Discord.User): User {
-    return new User(user.id, user.username, user.username, user.bot)
+  normalizeUser(message: Discord.Message): User {
+    let member: Discord.GuildMember | undefined
+    if (message.guild)
+      member = message.guild.members.cache.get(message.author.id)
+    let nickname: string
+    if (member && member.nickname) nickname = member.nickname
+    else nickname = message.author.username
+    return new User(
+      message.author.id,
+      nickname,
+      message.author.username,
+      message.author.bot,
+      Array.from(member ? member.roles.cache.keys() : []),
+    )
+  }
+  normalizeMessage(message: Discord.Message): MessageLike {
+    message.member
+    return new MessageLike(
+      message.id,
+      this.normalizeUser(message),
+      message.content,
+      message.channel.id,
+      this,
+    )
   }
   async send(content: string, channel: string): Promise<MessageLike> {
     const c = this.client.channels.cache.get(channel) as Discord.TextChannel
     if (!c) throw new Error(`Channel not found: ${channel}`)
     const res = await c.send(content)
-    return new MessageLike(
-      res.id,
-      this.normalizeUser(res.author),
-      res.content,
-      res.channel.id,
-      this,
-    )
+    return this.normalizeMessage(res)
   }
 
   async sendAll(content: string): Promise<MessageLike[]> {
@@ -78,7 +104,7 @@ export default class DiscordDriver implements Driver {
     })
     return new MessageLike(
       res.id,
-      this.normalizeUser(res.author),
+      this.normalizeUser(res),
       res.content,
       res.channel.id,
       this,

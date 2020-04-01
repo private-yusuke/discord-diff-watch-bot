@@ -10,11 +10,13 @@ declare module '*/config.json' {
     channels: string[]
     motd: boolean
     threshold: number
+    permittedGroups: string[]
   }
   interface Config {
     watchInterval: Duration
     watchURLs: string[]
     discord: DiscordConfig
+    commandPrefix: string
   }
 
   const value: Config

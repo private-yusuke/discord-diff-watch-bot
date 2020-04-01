@@ -3,6 +3,8 @@ import { Stream } from 'stream'
 
 export default interface Driver {
   name: string
+  onMessage?: (message: MessageLike) => void
+
   send: (content: string, channel: string) => Promise<MessageLike>
   sendAll: (content: string) => Promise<MessageLike[]>
   upload: (
