@@ -4,6 +4,13 @@ import config from './config.json'
 import { Readable } from 'stream'
 import DiscordDriver from './drivers/discord'
 import MessageLike from './models/message-like'
+import fetch from 'node-fetch'
+import * as fs from 'fs'
+
+function writeConfig(config: unknown): void {
+  const path = `${__dirname}/config.json`
+  fs.writeFileSync(path, JSON.stringify(config))
+}
 
 async function main(): Promise<void> {
   console.log('>>> Starting... <<<')
@@ -51,8 +58,24 @@ async function main(): Promise<void> {
               config.discord.permittedGroups.includes(v),
             )
           ) {
-            console.log(`URL Added by ${msg.user.username}: ${command[1]}`)
-            config.watchURLs.push(command[1])
+            const url = command[1]
+            console.debug(url)
+            let testRes
+            try {
+              testRes = await fetch(url)
+              if (!testRes.ok)
+                msg.reply(
+                  `Error: server returned ${testRes.status} ${testRes.statusText}`,
+                )
+              else {
+                config.watchURLs.push(url)
+                writeConfig(config)
+                msg.reply(`Successfully added the URL: ${url}`)
+              }
+            } catch (e) {
+              console.debug(e)
+              msg.reply(`Error: ${e.message}`)
+            }
           } else {
             msg.reply("You don't have a permission!")
           }
@@ -60,5 +83,4 @@ async function main(): Promise<void> {
     }
   }
 }
-
 main()
