@@ -68,9 +68,11 @@ async function main(): Promise<void> {
                   `Error: server returned ${testRes.status} ${testRes.statusText}`,
                 )
               else {
-                config.watchURLs.push(url)
-                writeConfig(config)
-                msg.reply(`Successfully added the URL: ${url}`)
+                if (!config.watchURLs.includes(testRes.url)) {
+                  config.watchURLs.push(testRes.url)
+                  writeConfig(config)
+                  msg.reply(`Successfully added the URL: ${testRes.url}`)
+                }
               }
             } catch (e) {
               console.debug(e)
