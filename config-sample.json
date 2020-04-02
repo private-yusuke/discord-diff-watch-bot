@@ -13,6 +13,8 @@
             "write your channel ids here"
         ],
         "motd": false,
-        "threshold": 800
-    }
+        "threshold": 800,
+        "permittedGroups": ["write the role ids you want to permit"]
+    },
+    "commandPrefix": "!"
 }
