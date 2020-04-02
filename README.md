@@ -24,7 +24,7 @@ These settings can be changed by modifying `config.json`.
 
 - `WatchInterval`
   - `unit` Specify the unit. (seconds, minutes, hours, days, ……)
-  - `"value": 20, "unit": "seconds"` → 20 seconds
+  - `"value": 2, "unit": "minutes"` → 2 minutes
 - `watchURLs` Specify the URL to be monitored.
 - `discord`
   - `token` Specify the token of the bot you created [here](https://discordapp.com/developers/applications).

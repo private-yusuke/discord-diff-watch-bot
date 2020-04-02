@@ -20,6 +20,8 @@ A bot that runs on Discord and notifies you when it detects an update on a speci
 
 ### Windows をお使いの方
 
+Node.js をインストールしておいてください。
+
 1. このリポジトリを、Download ボタンを押してダウンロードします。
 2. zip ファイルを解凍します。
 3. 中にある `config-sample.json` を `config.json` としてコピーします。
@@ -39,7 +41,7 @@ A bot that runs on Discord and notifies you when it detects an update on a speci
 
 - `WatchInterval`
   - `unit` 単位を指定します。 (seconds, minutes, hours, days, ……)
-    - `"value": 20, "unit": "seconds"` → 2 分に 1 回
+    - `"value": 2, "unit": "minutes"` → 2 分に 1 回
   - `watchURLs` 監視対象の URL を指定します。
   - `discord`
     - `token` [ここ](https://discordapp.com/developers/applications)で作った bot の token を指定します。
