@@ -4,6 +4,8 @@ Discord 上で動作する、指定したウェブサイトの更新を検知し
 
 A bot that runs on Discord and notifies you when it detects an update on a specific website.
 
+[日本語版の説明はこちらです。](README-ja.md)
+
 ## Install
 
 1. `$ git clone https://github.com/private-yusuke/discord-diff-watch-bot`
