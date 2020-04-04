@@ -12,6 +12,37 @@ function writeConfig(config: unknown): void {
   fs.writeFileSync(path, JSON.stringify(config))
 }
 
+async function watchadd(msg: MessageLike, command: string[]) {
+  if (command.length < 2) {
+    msg.reply('Usage: watchadd <url>')
+  } else if (
+    msg.user.group.some((v) => config.discord.permittedGroups.includes(v))
+  ) {
+    const url = command[1]
+    console.debug(url)
+    let testRes
+    try {
+      testRes = await fetch(url)
+      if (!testRes.ok)
+        msg.reply(
+          `Error: server returned ${testRes.status} ${testRes.statusText}`,
+        )
+      else {
+        if (!config.watchURLs.includes(testRes.url)) {
+          config.watchURLs.push(testRes.url)
+          writeConfig(config)
+          msg.reply(`Successfully added the URL: ${testRes.url}`)
+        }
+      }
+    } catch (e) {
+      console.debug(e)
+      msg.reply(`Error: ${e.message}`)
+    }
+  } else {
+    msg.reply("You don't have a permission!")
+  }
+}
+
 async function main(): Promise<void> {
   console.log('>>> Starting... <<<')
   console.log(moment().toString())
@@ -51,36 +82,13 @@ async function main(): Promise<void> {
       console.debug(msg.user.group)
       switch (command[0]) {
         case 'watchadd':
-          if (command.length < 2) {
-            msg.reply('Usage: watchadd <url>')
-          } else if (
-            msg.user.group.some((v) =>
-              config.discord.permittedGroups.includes(v),
-            )
-          ) {
-            const url = command[1]
-            console.debug(url)
-            let testRes
-            try {
-              testRes = await fetch(url)
-              if (!testRes.ok)
-                msg.reply(
-                  `Error: server returned ${testRes.status} ${testRes.statusText}`,
-                )
-              else {
-                if (!config.watchURLs.includes(testRes.url)) {
-                  config.watchURLs.push(testRes.url)
-                  writeConfig(config)
-                  msg.reply(`Successfully added the URL: ${testRes.url}`)
-                }
-              }
-            } catch (e) {
-              console.debug(e)
-              msg.reply(`Error: ${e.message}`)
-            }
-          } else {
-            msg.reply("You don't have a permission!")
-          }
+          await watchadd(msg, command)
+          break
+        case 'ping':
+          await msg.reply('pong!')
+          break
+        default:
+          break
       }
     }
   }
