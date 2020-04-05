@@ -6,6 +6,12 @@
     "watchURLs": [
         "http://www.tsukuba.ac.jp/"
     ],
+    "watchTargets": [
+      {
+        "url": "https://www.coins.tsukuba.ac.jp/",
+        "selector": "#content"
+      }
+    ],
     "discord": {
         "token": "write your token here",
         "channels": [

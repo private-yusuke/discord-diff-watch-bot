@@ -1,11 +1,31 @@
 import moment from 'moment'
 import Watcher from './watcher'
-import config from './config.json'
 import { Readable } from 'stream'
 import DiscordDriver from './drivers/discord'
 import MessageLike from './models/message-like'
 import fetch from 'node-fetch'
 import * as fs from 'fs'
+const config: Config = JSON.parse(fs.readFileSync('config.json', 'utf-8'))
+
+interface Config {
+  watchInterval: {
+    value: number
+    unit: string
+  }
+  watchURLs: string[]
+  watchTargets?: {
+    url: string
+    selector?: string
+  }[]
+  discord: {
+    token: string
+    channels: string[]
+    motd: boolean
+    threshold: number
+    permittedGroups: string[]
+  }
+  commandPrefix: string
+}
 
 function writeConfig(config: unknown): void {
   const path = `${__dirname}/config.json`
@@ -55,16 +75,18 @@ async function main(): Promise<void> {
     config.watchInterval.value,
     config.watchInterval.unit as moment.unitOfTime.Base,
   )
-  const watcher = new Watcher(config.watchURLs, duration)
+  const urlTargets = config.watchURLs.map((url: string) => ({ url: url }))
+  const targets = urlTargets.concat(config.watchTargets || [])
+  const watcher = new Watcher(targets, duration)
   watcher.onDiff = (diff): void => {
-    console.debug(`diff found: ${moment().toString()} at ${diff.url}`)
+    console.debug(`diff found: ${moment().toString()} at ${diff.target.url}`)
     console.debug(diff.d)
     const message = `更新が検出されました！${moment().format(
       'YYYY-MM-DD HH:mm:ss',
-    )}\n${diff.url}`
+    )}\n${diff.target.url}`
     const content = `更新が検出されました！${moment().format(
       'YYYY-MM-DD HH:mm:ss',
-    )}\`\`\`diff\n${diff.d}\`\`\`\n${diff.url}`
+    )}\`\`\`diff\n${diff.d}\`\`\`\n${diff.target.url}`
     if (content.length > config.discord.threshold) {
       const readable = new Readable()
       readable.push(diff.d)
