@@ -55,16 +55,18 @@ async function main(): Promise<void> {
     config.watchInterval.value,
     config.watchInterval.unit as moment.unitOfTime.Base,
   )
-  const watcher = new Watcher(config.watchURLs, duration)
+  const urlTargets = config.watchURLs.map((url: string) => ({ url: url }))
+  const targets = urlTargets.concat(config.watchTargets)
+  const watcher = new Watcher(targets, duration)
   watcher.onDiff = (diff): void => {
-    console.debug(`diff found: ${moment().toString()} at ${diff.url}`)
+    console.debug(`diff found: ${moment().toString()} at ${diff.target.url}`)
     console.debug(diff.d)
     const message = `更新が検出されました！${moment().format(
       'YYYY-MM-DD HH:mm:ss',
-    )}\n${diff.url}`
+    )}\n${diff.target.url}`
     const content = `更新が検出されました！${moment().format(
       'YYYY-MM-DD HH:mm:ss',
-    )}\`\`\`${diff.d}\`\`\`\n${diff.url}`
+    )}\`\`\`${diff.d}\`\`\`\n${diff.target.url}`
     if (content.length > config.discord.threshold) {
       const readable = new Readable()
       readable.push(diff.d)
