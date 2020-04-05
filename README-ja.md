@@ -41,13 +41,16 @@ Node.js をインストールしておいてください。
 
 - `WatchInterval`
   - `unit` 単位を指定します。 (seconds, minutes, hours, days, ……)
-    - `"value": 2, "unit": "minutes"` → 2 分に 1 回
-  - `watchURLs` 監視対象の URL を指定します。
-  - `discord`
-    - `token` [ここ](https://discordapp.com/developers/applications)で作った bot の token を指定します。
-    - `channels` 通知を配信するチャンネルの ID を指定します。
-    - `motd` 起動時に起動メッセージを配信するか指定します。(🇯🇵)
-    - `threshold` 省略しないで Discord に配信する文字数を指定します。
+  - `"value": 2, "unit": "minutes"` → 2 分に 1 回
+- `watchURLs` 監視対象の URL を指定します。
+- `watchTargets`
+  - `url` 監視対象の URL を指定します。
+  - `selector` どの要素を監視するか指定します。
+- `discord`
+  - `token` [ここ](https://discordapp.com/developers/applications)で作った bot の token を指定します。
+  - `channels` 通知を配信するチャンネルの ID を指定します。
+  - `motd` 起動時に起動メッセージを配信するか指定します。(🇯🇵)
+  - `threshold` 省略しないで Discord に配信する文字数を指定します。
 
 ---
 
