@@ -64,7 +64,7 @@ async function main(): Promise<void> {
     )}\n${diff.url}`
     const content = `更新が検出されました！${moment().format(
       'YYYY-MM-DD HH:mm:ss',
-    )}\`\`\`${diff.d}\`\`\`\n${diff.url}`
+    )}\`\`\`diff\n${diff.d}\`\`\`\n${diff.url}`
     if (content.length > config.discord.threshold) {
       const readable = new Readable()
       readable.push(diff.d)
